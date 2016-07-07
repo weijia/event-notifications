@@ -5,6 +5,7 @@ import django.db.models as models
 from extra_views import InlineFormSet
 
 from djangoautoconf.class_based_views.detail_with_inline_view import DetailWithInlineView
+from event_notification.inline_formset_name_mixin import InlineFormsetNameMixin
 
 
 def get_verbose_name(self):
@@ -13,10 +14,10 @@ def get_verbose_name(self):
 
 def get_event_class(model_class):
     event_class = type("%s%s" % (model_class.__name__, "Notification"),
-                       (Event, ), {
+                       (Event, InlineFormsetNameMixin), {
                            "last_modifier": models.ForeignKey(User, null=True, blank=True),
                            "item": models.ForeignKey(model_class),
-                           "get_verbose_name": get_verbose_name,
+                           # "get_verbose_name": get_verbose_name,
                        })
     return event_class
 
