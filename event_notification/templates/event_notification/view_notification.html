@@ -1,0 +1,24 @@
+{% extends "detail_with_inline_view.html" %}
+{% load bootstrap %}
+{% load static %}
+{% load i18n %}
+{% load modelview_detail %}
+{% block js %}
+    {{ block.super }}
+    <script>
+        var customAddText="{% trans 'add another' %}";
+        var customRemoveText="{% trans 'remove' %}";
+    </script>
+    <script src="{% static 'tax_app/js/create_request.js'%}"></script>
+    <link rel="stylesheet" type="text/css"
+          href="{% static 'event_notification/js/datetimepicker/build/jquery.datetimepicker.min.css' %}"/>
+    <script src="{% static 'event_notification/js/datetimepicker/build/jquery.datetimepicker.full.js' %}"></script>
+<script>
+$(function() { // document ready
+    $('input.form-control[name$=-start]').datetimepicker({closeOnDateSelect:true, allowTimes:[
+      '00:00'], defaultTime: '00:00'});
+    $('input.form-control[name$=-end]').datetimepicker({closeOnDateSelect:true, allowTimes:[
+      '00:00'], defaultTime: '00:00'});
+});
+</script>
+{% endblock %}

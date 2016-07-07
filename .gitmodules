@@ -1,0 +1,3 @@
+[submodule "event_notification/static/event_notification/js/datetimepicker"]
+	path = event_notification/static/event_notification/js/datetimepicker
+	url = https://github.com/xdan/datetimepicker.git
