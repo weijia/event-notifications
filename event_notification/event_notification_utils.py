@@ -4,7 +4,7 @@ from schedule.models import Event
 import django.db.models as models
 from extra_views import InlineFormSet
 
-from djangoautoconf.class_based_views import DetailWithInlineView
+from djangoautoconf.class_based_views.detail_with_inline_view import DetailWithInlineView
 
 
 def get_verbose_name(self):
@@ -25,24 +25,26 @@ class NotificationFactory(object):
     fields = None
     extra = 1
 
-    def __init__(self, model_class, event_class=None):
+    def __init__(self, model_class, event_class=None, inline_class=None):
         super(NotificationFactory, self).__init__()
         self.model_class = model_class
-        self.event_class = None
+        self.event_class = event_class
+        self.inline_class = inline_class
 
     def get_inline_class(self):
         fields = self.fields or ["start", "end", "title", "description"]
-        inline_class = type("%s%s" % (self.model_class.__name__, "Inline"),
+        event_class = self._get_event_model_class()
+        inline_class = type("%s%s" % (event_class.__name__, "Inline"),
                             (InlineFormSet, ), {
                                 # "Meta": type("Meta", (), {"model": self.model_class, "fields": []}),
-                                "model": self._get_event_model_class(),
+                                "model": event_class,
                                 "extra": self.extra,
                                 "fields": fields
                             })
         return inline_class
 
     def _get_event_model_class(self):
-        if self.event_class is None:
+        if self.event_class is not None:
             return self.event_class
         return get_event_class(self.model_class)
 
@@ -50,17 +52,17 @@ class NotificationFactory(object):
         base_view_name = "CreateView"
         base_class = CreateWithInlinesView
 
-        return self._get_view(base_class, base_view_name)
+        return self.get_view(base_class, base_view_name)
 
     def get_notification_update_view(self):
         base_view_name = "UpdateView"
         base_class = DetailWithInlineView
 
-        return self._get_view(base_class, base_view_name)
+        return self.get_view(base_class, base_view_name)
 
-    def _get_view(self, base_class, base_view_name):
-        inline_class = self.get_inline_class()
-        fields = self.fields or ["start", "end", "title", "description"]
+    def get_view(self, base_view_name, base_class):
+        inline_class = self.inline_class or self.get_inline_class()
+        # fields = self.fields or ["start", "end", "title", "description"]
         create_view = type("%s%s" % (self.model_class.__name__, base_view_name), (base_class,),
                            {
                                "model": self.model_class,
